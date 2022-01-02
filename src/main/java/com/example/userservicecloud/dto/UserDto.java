@@ -1,5 +1,6 @@
 package com.example.userservicecloud.dto;
 
+import com.example.userservicecloud.entity.UserEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,4 +16,8 @@ public class UserDto {
     private String userId;
     private LocalDateTime createAt;
     private String encryptedPwd;
+
+    public UserEntity toEntity(UserDto userDto){
+        return new UserEntity(this.name, this.email, this.userId, this.encryptedPwd, this.createAt);
+    }
 }
