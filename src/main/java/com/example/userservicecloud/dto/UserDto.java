@@ -14,10 +14,10 @@ public class UserDto {
     private String email;
     private String password;
     private String userId;
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
     private String encryptedPwd;
 
     public UserEntity toEntity(UserDto userDto){
-        return new UserEntity(this.name, this.email, this.userId, this.encryptedPwd, this.createAt);
+        return new UserEntity(this.name, this.email, this.userId, this.encryptedPwd, this.createdAt);
     }
 }

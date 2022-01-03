@@ -4,12 +4,13 @@ import com.example.userservicecloud.dto.UserDto;
 import com.example.userservicecloud.service.UserService;
 import com.example.userservicecloud.vo.Greeting;
 import com.example.userservicecloud.vo.RequestUser;
+import com.example.userservicecloud.vo.ResponseUser;
 import com.netflix.discovery.converters.Auto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/")
@@ -37,14 +38,19 @@ public class UserController {
         return greeting.getMessage();
     }
 
-    @GetMapping("/users")
-    public String createUser(RequestUser requestUser){
+    @PostMapping("/users")
+    public ResponseEntity<ResponseUser> createUser(@RequestBody RequestUser requestUser){
         UserDto userDto = new UserDto();
         userDto.setEmail(requestUser.getEmail());
         userDto.setName(requestUser.getName());
         userDto.setPassword(requestUser.getPassword());
         userService.createUser(userDto);
 
-        return "Create User Method call";
+        ResponseUser responseUser = new ResponseUser();
+        responseUser.setName(userDto.getName());
+        responseUser.setEmail(userDto.getEmail());
+        responseUser.setUserId(userDto.getUserId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseUser);
     }
 }
