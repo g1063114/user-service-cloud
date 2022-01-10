@@ -1,6 +1,7 @@
 package com.example.userservicecloud.controller;
 
 import com.example.userservicecloud.dto.UserDto;
+import com.example.userservicecloud.entity.UserEntity;
 import com.example.userservicecloud.service.UserService;
 import com.example.userservicecloud.vo.Greeting;
 import com.example.userservicecloud.vo.RequestUser;
@@ -12,8 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
-@RequestMapping("/")
+@RequestMapping("/user-service")
 public class UserController {
 
     private Environment env;
@@ -28,17 +32,17 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/user-service/health_check")
+    @GetMapping("/health_check")
     public String status(){
         return String.format("It's Working in User Service on PORT %s",env.getProperty("local.server.port"));
     }
 
-    @GetMapping("/user-service/welcome")
+    @GetMapping("/welcome")
     public String welcome(){
         return greeting.getMessage();
     }
 
-    @PostMapping("/user-service/users")
+    @PostMapping("/users")
     public ResponseEntity<ResponseUser> createUser(@RequestBody RequestUser requestUser){
         UserDto userDto = new UserDto();
         userDto.setEmail(requestUser.getEmail());
@@ -52,5 +56,26 @@ public class UserController {
         responseUser.setUserId(userDto.getUserId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseUser);
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<ResponseUser>> getUsers(){
+        Iterable<UserEntity> userList = userService.getUserByAll();
+
+        List<ResponseUser> result = new ArrayList<>();
+        userList.forEach( v -> {
+            result.add(new ResponseUser(v.getName(), v.getEmail(), v.getUserId()));
+        });
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<ResponseUser> getUser(@PathVariable("userId") String userId){
+        UserDto userDto = userService.getUserByUserId(userId);
+
+        ResponseUser responseUser = new ResponseUser(userDto.getName(), userDto.getEmail(), userDto.getUserId());
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseUser);
     }
 }
